@@ -1,0 +1,88 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+
+<dom-module id="my-view2">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      paper-card {
+        --paper-card:{
+          width: 200px
+        }
+      }
+    </style>
+    <iron-ajax
+      auto
+      url="{{url}}"
+      handle-as="json"
+      on-response="handleResponse">
+    </iron-ajax>
+
+    <div class="card">
+      <template id="pokemons" is="dom-repeat" items="[[pokedata]]">
+        <paper-card heading="{{item.name}}" image="{{item.img}}">
+          <div class="card-content">
+            <p>Pokemon ID: {{item.index}}</p>
+          </div>
+        </paper-card>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    class MyView2 extends Polymer.Element {
+      static get is() { return 'my-view2'; }
+      static get properties() {
+        return {
+          response: {
+            type: Array,
+            value: []
+          },
+          pokedata: {
+            type: Array,
+            value: []
+          },
+        }
+      }
+
+      handleResponse(e) {
+        console.log(e.detail.reponse);
+        this.response = e.detail.response.results;// 1.- gestionar la llamada al servicio que trae 50 elementos
+        this.response.forEach((pokemon, id) => {
+        const pokedata = `(https://pokeapi.co/api/v2/pokemon/${id+1})`;    
+          this.pokedata.push({
+            name: pokemon.name,
+            index: id + 1,
+            img: `https://pokeres.bastionbot.org/images/pokemon/${id+1}.png`
+          });
+
+        });
+        this.$.pokemons.render();
+        console.log(this.pokedata);
+      }
+    }
+
+
+    window.customElements.define(MyView2.is, MyView2);
+  </script>
+</dom-module>

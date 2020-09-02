@@ -1,0 +1,151 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      paper-card {
+        --paper-card: {
+          display: block;
+          width: 50%;
+          min-width: 500px;
+          padding: 0 1rem 1rem;
+          margin: 0 auto;
+        }
+        --paper-card-header-text: {
+          text-align: center;
+          font-weight: 900;
+          font-size: 1rem;
+          padding: 1rem 1rem 0
+        }
+        @apply --workshop-login-paper-card;
+      }
+      paper-input {
+        margin: 1rem 0 1rem 0;
+        --paper-input-container: {
+          background: lightgray;
+          padding: 0 1rem 1rem 1rem;
+        }
+        --paper-input-container-underline: {
+          display: none;
+        }
+        --paper-input-container-underline-focus: {
+          display: none;
+        }
+        @apply --workshop-login-paper-input;
+      }
+      paper-button {
+        --paper-button: {
+          background: #FF0093;
+          width: 100%;
+          border-radius: 0;
+          margin: 0;
+        }
+        @apply --workshop-login-paper-button;
+      }
+      .overlay {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        background: blueviolet;
+        @apply --workshop-login-paper-input;
+      }
+    </style>
+
+    <div class="card">
+
+      <template is="dom-if" if="{{!logged}}">
+        <paper-card heading="[[loginTitle]]" animated="false">
+          <p>Para acceder ingresa cualquier valor en ambos inputs</p>
+          <paper-input label="email" value="{{emailValue}}"></paper-input>
+          <paper-input label="password" value="{{passwordValue}}"></paper-input>
+          <paper-chekbox></paper-chekbox>
+          <paper-button on-click="loginSubmit" disabled="[[btnEnabler]]">[[buttonValue]]</paper-button>
+          <slot></slot>
+        </paper-card>
+      </template>
+      <template is="dom-if" if="{{logged}}">
+        <div>[[greeting]]</div>
+      </template>
+
+    </div>
+  </template>
+
+  <script>
+    class MyView1 extends Polymer.Element {
+      static get is() { return 'my-view1'; }
+      static get properties() {
+        return {
+          loginTitle: {
+            type: String,
+            value: 'Workshop Login'
+          },
+          emailValue: {
+            type: String,
+            notify: true
+          },
+          passwordValue: {
+            type: String,
+            notify: true
+          },
+          buttonValue: {
+           type: String,
+           value: 'button' 
+          },
+          btnEnabler: {
+            type: Boolean,
+            value: true
+          },
+          overlay: {
+            type: String,
+            value: 'overlay'
+          },
+          logged: {
+            type: Boolean,
+            value: false
+          },
+          greeting: {
+            value: 'Bienvenido'
+          }
+        };
+      }
+      static get observers() {
+        return [
+          'enableButton(emailValue,passwordValue)' // Este observer verifica que ambos inputs tengan contenido y activa el botón
+        ]
+      }
+      loginSubmit() {
+        this.set('logged', true); // Tambien se puede usar "this.logged = true" la diferencia es que el metodo set crea una nueva instancia en memoria del navegador
+      }
+
+      enableButton(emailValue,passwordValue) {
+        if( emailValue  &&  passwordValue) {
+          this.btnEnabler = false
+        }else {
+          this.btnEnabler = true
+        }
+      }
+    }
+
+    window.customElements.define(MyView1.is, MyView1);
+  </script>
+</dom-module>
